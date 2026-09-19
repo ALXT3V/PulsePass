@@ -6,7 +6,7 @@ CREATE TABLE venues (
     address VARCHAR(255) NOT NULL,
     capacity INT NOT NULL CONSTRAINT chk_venues_capacity CHECK (capacity > 0),
     active BOOLEAN NOT NULL DEFAULT TRUE,
-    CONSTRAINT uk_venues_code UNIQUE
+    CONSTRAINT uk_venues_code UNIQUE(code)
 );
 
 CREATE TABLE events (
@@ -16,11 +16,11 @@ CREATE TABLE events (
     description TEXT,
     category VARCHAR(50) NOT NULL,
     status VARCHAR(50) NOT NULL,
-    event_date TIMESTAMPZ NOT NULL,
+    event_date TIMESTAMPTZ NOT NULL,
     minimum_age INT NOT NULL DEFAULT 0,
     venue_id BIGINT NOT NULL,
     CONSTRAINT fk_events_venue FOREIGN KEY (venue_id) REFERENCES venues(id),
-    CONSTRAINT uk_events_event_code UNIQUE
+    CONSTRAINT uk_events_event_code UNIQUE(event_code)
 );
 
 CREATE TABLE artists (
@@ -29,7 +29,7 @@ CREATE TABLE artists (
     country VARCHAR(100) NOT NULL,
     genre VARCHAR(50) NOT NULL,
     active BOOLEAN NOT NULL DEFAULT TRUE,
-    CONSTRAINT uk_artists_stage_name UNIQUE
+    CONSTRAINT uk_artists_stage_name UNIQUE(stage_name)
 );
 
 CREATE TABLE event_artists (
@@ -45,8 +45,8 @@ CREATE TABLE users (
     username VARCHAR(50) NOT NULL,
     email VARCHAR(100) NOT NULL,
     active BOOLEAN NOT NULL DEFAULT TRUE,
-    CONSTRAINT uk_users_username UNIQUE,
-    CONSTRAINT uk_users_email UNIQUE
+    CONSTRAINT uk_users_username UNIQUE(username),
+    CONSTRAINT uk_users_email UNIQUE(email)
 
 );
 
@@ -67,12 +67,12 @@ CREATE TABLE tickets (
     type VARCHAR(50) NOT NULL,
     price NUMERIC(12, 2) NOT NULL,
     status VARCHAR(50) NOT NULL,
-    purchase_date TIMESTAMPZ NOT NULL,
+    purchase_date TIMESTAMPTZ NOT NULL,
     user_id BIGINT NOT NULL,
     event_id BIGINT NOT NULL,
     CONSTRAINT fk_tickets_user FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT fk_tickets_event FOREIGN KEY (event_id) REFERENCES events(id),
-    CONSTRAINT uk_tickets_ticket_code UNIQUE,
+    CONSTRAINT uk_tickets_ticket_code UNIQUE(ticket_code),
     CONSTRAINT chk_tickets_price CHECK (price >= 0)
 );
 
