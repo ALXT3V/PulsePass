@@ -1,5 +1,10 @@
 package com.pulsepass.dto.response;
 
-public class ArtistResponse {
+public record ArtistResponse(
+    Long id,
+    String stageName,
+    String genre,
+    Boolean active
+) {
     
 }
