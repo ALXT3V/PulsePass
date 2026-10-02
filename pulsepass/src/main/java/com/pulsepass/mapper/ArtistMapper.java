@@ -1,5 +1,12 @@
 package com.pulsepass.mapper;
 
-public class ArtistMapper {
+import org.mapstruct.Mapper;
+
+import com.pulsepass.domain.Artist;
+import com.pulsepass.dto.response.ArtistResponse;
+
+@Mapper(componentModel="spring")
+public interface ArtistMapper {
+    ArtistResponse toResponse(Artist artist);
     
 }
