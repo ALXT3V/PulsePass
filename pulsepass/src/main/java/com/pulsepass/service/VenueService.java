@@ -1,5 +1,11 @@
 package com.pulsepass.service;
 
-public class VenueService {
+import java.util.List;
+
+import com.pulsepass.dto.response.VenueResponse;
+
+public interface VenueService {
+    VenueResponse findByCode(String code);
+    List<VenueResponse> findActiveVenues();
     
 }
