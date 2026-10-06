@@ -33,11 +33,11 @@ class ArtistServiceImplTest {
     private ArtistServiceImpl artistService;
 
     @Test
-    @DisplayName("TEST-ARTIST-001: Buscar artista por ID existente retorna DTO")
+    @DisplayName("TEST-ARTIST-001: Buscar artista por ID existente retorna ArtistResponse (FR-SVC-009)")
     void findById_ExistingId_ReturnsArtistResponse() {
         Long artistId = 1L;
         Artist artist = new Artist();
-        ArtistResponse expectedResponse = new ArtistResponse(artistId, "Shakira", "Pop/Latin", true);
+        ArtistResponse expectedResponse = mock(ArtistResponse.class);
 
         when(artistRepository.findById(artistId)).thenReturn(Optional.of(artist));
         when(artistMapper.toResponse(artist)).thenReturn(expectedResponse);
@@ -45,29 +45,29 @@ class ArtistServiceImplTest {
         ArtistResponse result = artistService.findById(artistId);
 
         assertThat(result).isNotNull();
-        assertThat(result.stageName()).isEqualTo("Shakira");
+        assertThat(result).isEqualTo(expectedResponse);
         verify(artistRepository).findById(artistId);
     }
 
     @Test
-    @DisplayName("TEST-ARTIST-002: Buscar artista por ID inexistente lanza ResourceNotFoundException")
+    @DisplayName("TEST-ARTIST-002: BR-ARTIST-001 - Artista por ID inexistente lanza ResourceNotFoundException")
     void findById_NonExistingId_ThrowsResourceNotFoundException() {
         Long artistId = 99L;
         when(artistRepository.findById(artistId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> artistService.findById(artistId))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Artist not found with id");
+                .hasMessageContaining("Artist not found with id: " + artistId);
 
         verify(artistRepository).findById(artistId);
     }
 
     @Test
-    @DisplayName("TEST-ARTIST-003: Buscar artista por nombre artistico existente retorna DTO")
-    void findByStageName_ExistingName_ReturnsArtistResponse() {
-        String stageName = "Shakira";
+    @DisplayName("TEST-ARTIST-003: Buscar artista por stageName existente retorna ArtistResponse")
+    void findByStageName_ExistingStageName_ReturnsArtistResponse() {
+        String stageName = "Solar Beat";
         Artist artist = new Artist();
-        ArtistResponse expectedResponse = new ArtistResponse(1L, stageName, "Pop/Latin", true);
+        ArtistResponse expectedResponse = mock(ArtistResponse.class);
 
         when(artistRepository.findByStageName(stageName)).thenReturn(Optional.of(artist));
         when(artistMapper.toResponse(artist)).thenReturn(expectedResponse);
@@ -75,35 +75,35 @@ class ArtistServiceImplTest {
         ArtistResponse result = artistService.findByStageName(stageName);
 
         assertThat(result).isNotNull();
-        assertThat(result.stageName()).isEqualTo(stageName);
+        assertThat(result).isEqualTo(expectedResponse);
         verify(artistRepository).findByStageName(stageName);
     }
 
     @Test
-    @DisplayName("TEST-ARTIST-004: Buscar artista por nombre artistico inexistente lanza ResourceNotFoundException")
-    void findByStageName_NonExistingName_ThrowsResourceNotFoundException() {
-        String stageName = "UNKNOWN";
+    @DisplayName("TEST-ARTIST-004: BR-ARTIST-001 - stageName inexistente lanza ResourceNotFoundException")
+    void findByStageName_NonExistingStageName_ThrowsResourceNotFoundException() {
+        String stageName = "Unknown Band";
         when(artistRepository.findByStageName(stageName)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> artistService.findByStageName(stageName))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Artist not found with stage name");
+                .hasMessageContaining("Artist not found with stage name: " + stageName);
 
         verify(artistRepository).findByStageName(stageName);
     }
 
     @Test
-    @DisplayName("TEST-ARTIST-005: Listar artistas activos retorna lista filtrada")
-    void findActiveArtist_ReturnsActiveArtists() {
-        Artist artist = new Artist();
-        ArtistResponse response = new ArtistResponse(1L, "Shakira", "Pop/Latin", true);
+    @DisplayName("TEST-ARTIST-005: BR-ARTIST-002 - findActiveArtists() retorna lista de artistas")
+    void findActiveArtists_ReturnsActiveArtistsOnly() {
+        Artist activeArtist = new Artist();
+        ArtistResponse response = mock(ArtistResponse.class);
 
-        when(artistRepository.findAll()).thenReturn(List.of(artist));
-        when(artistMapper.toResponse(artist)).thenReturn(response);
+        when(artistRepository.findAll()).thenReturn(List.of(activeArtist));
+        when(artistMapper.toResponse(activeArtist)).thenReturn(response);
 
         List<ArtistResponse> result = artistService.findActiveArtist();
 
-        assertThat(result).isNotNull();
+        assertThat(result).hasSize(1);
         verify(artistRepository).findAll();
     }
 }
