@@ -7,5 +7,5 @@ import com.pulsepass.dto.response.ArtistResponse;
 public interface ArtistService {
     ArtistResponse findById(Long id);
     ArtistResponse findByStageName(String stageName);
-    List<ArtistResponse> findActiveArtist();
+    List<ArtistResponse> findActiveArtists();
 }

@@ -42,7 +42,7 @@ public class ArtistServiceImpl implements ArtistService {
     
 
     @Override 
-    public List<ArtistResponse> findActiveArtist(){
+    public List<ArtistResponse> findActiveArtists(){
         return artistRepository.findAll()
             .stream()
             .filter(artist -> Boolean.TRUE.equals(artist.getActive()))

@@ -63,6 +63,8 @@ public class EventServiceImpl implements EventService {
         Event event = eventMapper.toEntity(request);
         event.setVenue(venue);
         event.setStatus(EventStatus.DRAFT);
+         event.setMinimumAge(request.minimumAge() != null ? request.minimumAge() : 0);
+
 
         Event savedEvent = eventRepository.save(event);
         return eventMapper.toResponse(savedEvent);

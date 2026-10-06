@@ -303,4 +303,5 @@ class TicketServiceImplTest {
         assertThat(result.status()).isEqualTo(TicketStatus.USED);
         verify(ticketRepository).save(ticket);
     }
+    
 }

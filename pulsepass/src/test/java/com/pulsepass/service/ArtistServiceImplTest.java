@@ -92,18 +92,25 @@ class ArtistServiceImplTest {
         verify(artistRepository).findByStageName(stageName);
     }
 
-    @Test
-    @DisplayName("TEST-ARTIST-005: BR-ARTIST-002 - findActiveArtists() retorna lista de artistas")
+     @Test
+    @DisplayName("TEST-ARTIST-005: BR-ARTIST-002 - findActiveArtists() retorna solo artistas activos")
     void findActiveArtists_ReturnsActiveArtistsOnly() {
         Artist activeArtist = new Artist();
+        activeArtist.setStageName("Solar Beat");
+        activeArtist.setActive(true);
+
+        Artist inactiveArtist = new Artist();
+        inactiveArtist.setStageName("Old Band");
+        inactiveArtist.setActive(false);
+
         ArtistResponse response = mock(ArtistResponse.class);
 
-        when(artistRepository.findAll()).thenReturn(List.of(activeArtist));
+        when(artistRepository.findAll()).thenReturn(List.of(activeArtist, inactiveArtist));
         when(artistMapper.toResponse(activeArtist)).thenReturn(response);
 
-        List<ArtistResponse> result = artistService.findActiveArtist();
+        List<ArtistResponse> result = artistService.findActiveArtists();
 
-        assertThat(result).hasSize(1);
-        verify(artistRepository).findAll();
+        assertThat(result).containsExactly(response);
+        verify(artistMapper, never()).toResponse(inactiveArtist);
     }
 }
