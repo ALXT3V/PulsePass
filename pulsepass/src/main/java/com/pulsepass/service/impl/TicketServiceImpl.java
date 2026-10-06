@@ -75,7 +75,7 @@ public class TicketServiceImpl implements TicketService {
             LocalDate eventDate = event.getEventDate() != null ? event.getEventDate().toLocalDate() : LocalDate.now();
             int age = Period.between(user.getProfile().getBirthDate(), eventDate).getYears();
             if(age < event.getMinimumAge()){
-                throw new BusinessRuleException("User does not meet the minimun age requirement of " + event.getMinimumAge());
+                throw new BusinessRuleException("User does not meet the minimum age requirement of " + event.getMinimumAge());
 
             }
 

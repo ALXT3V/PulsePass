@@ -24,7 +24,7 @@ public interface EventMapper {
     
     @Mapping(target = "venueCode", source = "venue.code")
     @Mapping(target = "venueName", source = "venue.name")
-    EventResponse toResponse(Event event);
+    EventResponse toResponse(Event updatedEvent);
 
     @Mapping(target = "venueName", source = "venue.name")
     EventSummaryResponse toSummaryResponse(Event event);

@@ -11,7 +11,7 @@ public record CreateEventRequest (
     String description,
     EventCategory category,
     LocalDateTime eventDate,
-    Integer minimunAge,
+    Integer minimumAge,
     String venueCode
 ){
     
