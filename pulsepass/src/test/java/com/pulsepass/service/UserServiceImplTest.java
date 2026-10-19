@@ -45,6 +45,7 @@ class UserServiceImplTest {
         RegisterUserRequest request = new RegisterUserRequest(
                 "carlos21",
                 "carlos@email.com",
+                "Password123456!",
                 "Carlos",
                 "Perez",
                 "3001234567",
@@ -92,6 +93,7 @@ class UserServiceImplTest {
         RegisterUserRequest request = new RegisterUserRequest(
                 "carlos21",
                 "carlos@email.com",
+                "Password123456!",
                 "Carlos",
                 "Perez",
                 "3001234567",
@@ -115,6 +117,7 @@ class UserServiceImplTest {
         RegisterUserRequest request = new RegisterUserRequest(
                 "carlos21",
                 "carlos@email.com",
+                "Password123456!",
                 "Carlos",
                 "Perez",
                 "3001234567",
@@ -138,6 +141,7 @@ class UserServiceImplTest {
         RegisterUserRequest request = new RegisterUserRequest(
                 "carlos21",
                 "carlos@email.com",
+                "Password123456!",
                 "Carlos",
                 "Perez",
                 "3001234567",

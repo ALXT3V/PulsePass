@@ -1,17 +1,21 @@
 package com.pulsepass.controller;
 
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pulsepass.dto.request.RegisterUserRequest;
 import com.pulsepass.dto.response.UserResponse;
 import com.pulsepass.exception.DuplicateResourceException;
 import com.pulsepass.exception.GlobalExceptionHandler;
+import com.pulsepass.security.CustomUserDetailsService;
+import com.pulsepass.security.JwtService;
 import com.pulsepass.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -26,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserController.class)
+@WebMvcTest(value = UserController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
 @Import(GlobalExceptionHandler.class)
 class UserControllerTest {
 
@@ -39,11 +43,17 @@ class UserControllerTest {
     @MockitoBean
     private UserService userService;
 
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private CustomUserDetailsService customUserDetailsService;
+
     @Test
     @DisplayName("TEST-CTRL-USR-001: registrar usuario válido retorna 201 Created")
     void register_ShouldReturn201_WhenValid() throws Exception {
         RegisterUserRequest request = new RegisterUserRequest(
-                "andrea_m", "andrea@gmail.com", "Andrea", "Mendoza",
+                "andrea_m", "andrea@gmail.com","Password123456!", "Andrea", "Mendoza",
                 "3001234567", "Santa Marta", LocalDate.of(1995, 5, 20)
         );
 
@@ -62,11 +72,12 @@ class UserControllerTest {
 
         verify(userService).register(any(RegisterUserRequest.class));
     }
+
     @Test
     @DisplayName("TEST-CTRL-USR-002: email inválido -> 400")
     void register_ShouldReturn400_WhenEmailInvalid() throws Exception {
         RegisterUserRequest invalidRequest = new RegisterUserRequest(
-                "andrea_m", "email-invalido", "Andrea", "Mendoza",
+                "andrea_m", "email-invalido", "Password123456!", "Andrea", "Mendoza",
                 "3001234567", "Santa Marta", LocalDate.of(1995, 5, 20)
         );
 
@@ -84,7 +95,7 @@ class UserControllerTest {
     @DisplayName("TEST-CTRL-USR-003: registrar usuario con username o email duplicado retorna 409 Conflict")
     void register_ShouldReturn409_WhenDuplicate() throws Exception {
         RegisterUserRequest request = new RegisterUserRequest(
-                "andrea_m", "andrea@gmail.com", "Andrea", "Mendoza",
+                "andrea_m", "andrea@gmail.com","Password123456!", "Andrea", "Mendoza",
                 "3001234567", "Santa Marta", LocalDate.of(1995, 5, 20)
         );
 
@@ -99,7 +110,9 @@ class UserControllerTest {
 
         verify(userService).register(any(RegisterUserRequest.class));
     }
+
     @Test
+    @WithMockUser
     @DisplayName("TEST-CTRL-USR-004: consultar por email -> 200")
     void findByEmail_ShouldReturn200() throws Exception {
         UserResponse response = new UserResponse(
@@ -117,6 +130,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("TEST-CTRL-USR-005: consultar por username -> 200")
     void findByUsername_ShouldReturn200() throws Exception {
         UserResponse response = new UserResponse(
