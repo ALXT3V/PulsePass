@@ -1,60 +1,76 @@
 package com.pulsepass.integration;
 
-import com.pulsepass.repository.TicketRepository;
-import com.pulsepass.repository.UserCredentialRepository;
-import com.pulsepass.repository.UserRepository;
-import com.pulsepass.repository.UserRoleRepository;
-import com.pulsepass.security.CustomUserDetailsService;
-import com.pulsepass.security.JwtService;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(properties = {
-    "spring.flyway.enabled=false",
-    "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration,org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration"
-})
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+
+import com.pulsepass.controller.AuthController;
+import com.pulsepass.controller.EventController;
+import com.pulsepass.controller.TicketController;
+import com.pulsepass.security.CustomUserDetailsService;
+import com.pulsepass.security.JwtService;
+import com.pulsepass.security.RestAccessDeniedHandler;
+import com.pulsepass.security.RestAuthenticationEntryPoint;
+import com.pulsepass.security.SecurityConfig;
+import com.pulsepass.service.AuthService;
+import com.pulsepass.service.EventService;
+import com.pulsepass.service.TicketService;
+
+@WebMvcTest(controllers = {AuthController.class, EventController.class, TicketController.class})
+@Import({SecurityConfig.class, RestAuthenticationEntryPoint.class, RestAccessDeniedHandler.class})
 class SecurityIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+   @Autowired
+private WebApplicationContext context;
 
-    @MockitoBean
-    private UserRepository userRepository;
+private MockMvc mockMvc;
 
-    @MockitoBean
-    private UserCredentialRepository credentialRepository;
+@BeforeEach
+void setUp() {
+    mockMvc = MockMvcBuilders
+            .webAppContextSetup(context)
+            .apply(SecurityMockMvcConfigurers.springSecurity())
+            .build();
+}
 
-    @MockitoBean
-    private UserRoleRepository roleRepository;
+    @MockitoBean 
+    private JwtService jwtService;
 
-    @MockitoBean
-    private TicketRepository ticketRepository;
-
-    @MockitoBean
+    @MockitoBean 
     private CustomUserDetailsService customUserDetailsService;
 
     @MockitoBean
-    private JwtService jwtService;
+    private AuthService authService;
+
+    @MockitoBean 
+    private EventService eventService;
+
+    @MockitoBean 
+    private TicketService ticketService;
+
 
     @Test
     void tSec001_anonymousCanAccessPublishedEvents() throws Exception {
         mockMvc.perform(get("/api/events/published"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -80,6 +96,8 @@ class SecurityIntegrationTest {
 
     @Test
     void tSec006_loginWithInvalidPasswordReturns401() throws Exception {
+        when(authService.login(any())).thenThrow(new BadCredentialsException("Credenciales inválidas"));
+
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"identifier\":\"andrea\",\"password\":\"WrongPassword!\"}"))

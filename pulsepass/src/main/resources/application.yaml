@@ -22,8 +22,8 @@ spring:
     driver-class-name: org.postgresql.Driver
 
 pulsepass:
- security:
-   jwt:
-      issuer: ${PULSEPASS_JWT_ISSUER:pulsepass-api}
-      secret-base64: ${PULSEPASS_JWT_SECRET_BASE64}
-      access-token-ttl: PT15M
+    security:
+    jwt:
+    issuer: ${PULSEPASS_JWT_ISSUER:pulsepass-api}
+    secret-base64: ${PULSEPASS_JWT_SECRET_BASE64}
+    access-token-ttl: PT15M

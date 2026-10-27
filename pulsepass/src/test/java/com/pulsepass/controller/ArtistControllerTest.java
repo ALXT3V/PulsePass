@@ -3,6 +3,8 @@ package com.pulsepass.controller;
 import com.pulsepass.dto.response.ArtistResponse;
 import com.pulsepass.exception.GlobalExceptionHandler;
 import com.pulsepass.exception.ResourceNotFoundException;
+import com.pulsepass.security.CustomUserDetailsService;
+import com.pulsepass.security.JwtService;
 import com.pulsepass.service.ArtistService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(GlobalExceptionHandler.class)
 class ArtistControllerTest {
 
+
+     @MockitoBean JwtService jwtService;
+    @MockitoBean CustomUserDetailsService customUserDetailsService;
+    
     @Autowired
     private MockMvc mockMvc;
 

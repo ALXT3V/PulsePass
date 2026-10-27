@@ -19,6 +19,7 @@ public interface EventMapper {
     @Mapping(target = "status", constant = "DRAFT")
     @Mapping(target = "venue", ignore = true)
     @Mapping(target = "artists", ignore = true)
+    @Mapping(target = "streamingUrl", ignore = true)
     Event toEntity(CreateEventRequest request);
     
     
